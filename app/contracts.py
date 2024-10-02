@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
@@ -20,9 +21,13 @@ class PostResponse(Post):
         from_attributes = True
 
 
-class CreateUser(BaseModel):
+class User(BaseModel):
     email: EmailStr
     password: str
+
+
+class CreateUser(User):
+    pass
 
 
 class UserResp(BaseModel):
@@ -32,3 +37,16 @@ class UserResp(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserCredentials(User):
+    pass
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    id: Optional[int] = None

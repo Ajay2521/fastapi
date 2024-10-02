@@ -5,10 +5,10 @@ from app.contracts import CreateUser, UserResp
 from app import models, utils
 from app.database import get_db
 
-router = APIRouter(prefix="/users")
+router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserResp)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=UserResp)
 def create_user(user: CreateUser, db: Session = Depends(get_db)):
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
