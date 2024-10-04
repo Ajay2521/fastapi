@@ -41,8 +41,9 @@ def get_posts(
         .filter(models.Post.title.contains(search))
         .limit(limit)
         .offset(offset)
-        .all
+        .all()
     )
+
     return posts
 
 
