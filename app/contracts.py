@@ -45,6 +45,14 @@ class PostResponse(Post):
         from_attributes = True
 
 
+class PostVoteResponse(BaseModel):
+    Post: PostResponse
+    Likes: int
+
+    class Config:
+        from_attributes = True
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -52,3 +60,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[int] = None
+
+
+class Like(BaseModel):
+    post_id: int

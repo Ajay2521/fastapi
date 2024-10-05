@@ -1,8 +1,9 @@
 from fastapi import Depends, HTTPException, status, APIRouter
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import Optional, List
 
-from app.contracts import CreatePost, PostResponse
+from app.contracts import CreatePost, PostResponse, PostVoteResponse
 from app import models
 from app.database import get_db
 from app.oauth2 import get_current_user
@@ -28,7 +29,7 @@ def create_post(
     return new_post
 
 
-@router.get("", response_model=List[PostResponse])
+@router.get("", response_model=List[PostVoteResponse])
 def get_posts(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -37,7 +38,9 @@ def get_posts(
     search: Optional[str] = "",
 ):
     posts = (
-        db.query(models.Post)
+        db.query(models.Post, func.count(models.Like.post_id).label("Likes"))
+        .join(models.Like, models.Post.id == models.Like.post_id, isouter=True)
+        .group_by(models.Post.id)
         .filter(models.Post.title.contains(search))
         .limit(limit)
         .offset(offset)
@@ -47,14 +50,20 @@ def get_posts(
     return posts
 
 
-@router.get("/{id}", response_model=PostResponse)
+@router.get("/{id}", response_model=PostVoteResponse)
 def get_post(
     id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)
 ):
     # cursor.execute('"SELECT * FROM posts WHERE id = %s"', (str(id),))
     # post = cursor.fetchone()
 
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+    post = (
+        db.query(models.Post, func.count(models.Like.post_id).label("Likes"))
+        .join(models.Like, models.Post.id == models.Like.post_id, isouter=True)
+        .group_by(models.Post.id)
+        .filter(models.Post.id == id)
+        .first()
+    )
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
