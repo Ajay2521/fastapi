@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Optional, List
 
-from app.contracts import CreatePost, PostResponse, PostVoteResponse
+from app.contracts import CreatePost, PostResponse, PostLikeResponse
 from app import models
 from app.database import get_db
 from app.oauth2 import get_current_user
@@ -29,7 +29,7 @@ def create_post(
     return new_post
 
 
-@router.get("", response_model=List[PostVoteResponse])
+@router.get("", response_model=List[PostLikeResponse])
 def get_posts(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -50,7 +50,7 @@ def get_posts(
     return posts
 
 
-@router.get("/{id}", response_model=PostVoteResponse)
+@router.get("/{id}", response_model=PostLikeResponse)
 def get_post(
     id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)
 ):

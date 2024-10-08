@@ -22,14 +22,14 @@ def like(
             detail=f"post with id: {like.post_id} does not exit",
         )
 
-    vote_query = db.query(models.Like).filter(
+    like_query = db.query(models.Like).filter(
         models.Like.post_id == like.post_id, models.Like.user_id == create_user.id
     )
 
-    if vote_query.first():
-        vote_query.delete(synchronize_session=False)
+    if like_query.first():
+        like_query.delete(synchronize_session=False)
         db.commit()
     else:
-        new_vote = models.Like(post_id=like.post_id, user_id=create_user.id)
-        db.add(new_vote)
+        new_like = models.Like(post_id=like.post_id, user_id=create_user.id)
+        db.add(new_like)
         db.commit()
